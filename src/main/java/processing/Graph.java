@@ -86,67 +86,6 @@ public class Graph<T> extends PApplet {
         showHoveredNodes();
     }
 
-    public void keyPressed() {
-        switch (key) {
-            case 't':
-                isShowingHoveredNodes = !isShowingHoveredNodes;
-                break;
-            case 'q':
-                System.exit(0);
-            case '+':
-                if (isShowingHoveredNodes)
-                    mouseRange = Math.min(mouseRange + 1, height);
-                break;
-            case '-':
-                if (isShowingHoveredNodes)
-                    mouseRange = Math.max(mouseRange - 1, 10);
-                break;
-            case 'r': {
-                int size = spatialPoints.getQuadTree().getNodes().size();
-                spatialPoints = new SpatialPoints<>();
-                for (int i = 0; i < size; i++) {
-                    spatialPoints.insert(Math.random() * 100, Math.random() * 100, dataFunction.apply(i));
-                }
-                break;
-            }
-            case ']':
-                if (range != null)
-                    range = Math.min(range + 1, spatialPoints.getQuadTree().getTopLeft().getLatitude() - spatialPoints.getQuadTree().getTopLeft().getLongitude());
-                else
-                    range = 1.0;
-                break;
-            case '[':
-                if (range != null)
-                    range = Math.max(range - 1, 1);
-                else
-                    range = 1.0;
-                break;
-            case 'p':
-                latitude = map(mouseY, 0, height, spatialPoints.getQuadTree().getTopLeft().getLatitude(), spatialPoints.getQuadTree().getBottomRight().getLatitude());
-                longitude = map(mouseX, 0, width, spatialPoints.getQuadTree().getTopLeft().getLongitude(), spatialPoints.getQuadTree().getBottomRight().getLongitude());
-                break;
-            case '\'': {
-                spatialPoints.insert(Math.random() * 100, Math.random() * 100, dataFunction.apply(size++));
-                break;
-            }
-            case ';': {
-                Set<QuadNode<T>> nodesToRemove = spatialPoints.getQuadTree()
-                        .getNodes()
-                        .stream()
-                        .filter(node -> node.getData().equals(dataFunction.apply(size - 1)))
-                        .collect(Collectors.toSet());
-                for (QuadNode<T> node : nodesToRemove)
-                    spatialPoints.remove(node);
-                size = spatialPoints.getQuadTree().getSize();
-                break;
-            }
-            case 'h':
-                showSearchResult = !showSearchResult;
-                break;
-        }
-        settings();
-    }
-
     private void showHoveredNodes() {
         if (!isShowingHoveredNodes) {
             cursor();
@@ -276,6 +215,73 @@ public class Graph<T> extends PApplet {
         latitude = map(latitude, spatialPoints.getQuadTree().getTopLeft().getLatitude(), spatialPoints.getQuadTree().getBottomRight().getLatitude(), 0, height);
         longitude = map(longitude, spatialPoints.getQuadTree().getTopLeft().getLongitude(), spatialPoints.getQuadTree().getBottomRight().getLongitude(), 0, width);
         point((float) longitude, (float) latitude);
+    }
+
+    public void keyPressed() {
+        switch (key) {
+            case 't':
+                isShowingHoveredNodes = !isShowingHoveredNodes;
+                break;
+            case 'q':
+                System.exit(0);
+            case '+':
+                if (isShowingHoveredNodes)
+                    mouseRange = Math.min(mouseRange + 1, height);
+                break;
+            case '-':
+                if (isShowingHoveredNodes)
+                    mouseRange = Math.max(mouseRange - 1, 10);
+                break;
+            case 'r': {
+                int size = spatialPoints.getQuadTree().getNodes().size();
+                spatialPoints = new SpatialPoints<>();
+                for (int i = 0; i < size; i++) {
+                    spatialPoints.insert(Math.random() * 100, Math.random() * 100, dataFunction.apply(i));
+                }
+                break;
+            }
+            case ']':
+                if (showSearchResult) {
+                    if (range != null)
+                        range = Math.min(range + 1, spatialPoints.getQuadTree().getTopLeft().getLatitude() - spatialPoints.getQuadTree().getTopLeft().getLongitude());
+                    else
+                        range = 1.0;
+                }
+                break;
+            case '[':
+                if (showSearchResult) {
+                    if (range != null)
+                        range = Math.max(range - 1, 1);
+                    else
+                        range = 1.0;
+                }
+                break;
+            case 'p':
+                if (showSearchResult) {
+                    latitude = map(mouseY, 0, height, spatialPoints.getQuadTree().getTopLeft().getLatitude(), spatialPoints.getQuadTree().getBottomRight().getLatitude());
+                    longitude = map(mouseX, 0, width, spatialPoints.getQuadTree().getTopLeft().getLongitude(), spatialPoints.getQuadTree().getBottomRight().getLongitude());
+                }
+                break;
+            case '\'': {
+                spatialPoints.insert(Math.random() * 100, Math.random() * 100, dataFunction.apply(size++));
+                break;
+            }
+            case ';': {
+                Set<QuadNode<T>> nodesToRemove = spatialPoints.getQuadTree()
+                        .getNodes()
+                        .stream()
+                        .filter(node -> node.getData().equals(dataFunction.apply(size - 1)))
+                        .collect(Collectors.toSet());
+                for (QuadNode<T> node : nodesToRemove)
+                    spatialPoints.remove(node);
+                size = spatialPoints.getQuadTree().getSize();
+                break;
+            }
+            case 'h':
+                showSearchResult = !showSearchResult;
+                break;
+        }
+        settings();
     }
 
 }
