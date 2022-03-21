@@ -1,19 +1,11 @@
 package quad;
 
-import quad.SpatialPoints.searchType;
-
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class SpatialPoints<T> {
 
     private final QuadTree<T> quadTree;
-
-    public static enum searchType {
-        CIRCLE, BOX, STRICT_BOX;
-    }
-
-    ;
 
     public SpatialPoints() {
         this.quadTree = new QuadTree<T>(new Point(100, 0), new Point(0, 100), 0);
@@ -49,7 +41,7 @@ public class SpatialPoints<T> {
                 return rangeAnswer.stream().filter(node -> isInside(node.getPoint(), minLat, maxLat, minLong, maxLong)).collect(Collectors.toSet());
             }
             case BOX:
-                return  rangeAnswer;
+                return rangeAnswer;
             case CIRCLE:
                 double radiusSquared = range * range;
                 return rangeAnswer.stream().filter(node -> isInside(node.getPoint(), latitude, longitude, radiusSquared)).collect(Collectors.toSet());
@@ -59,5 +51,9 @@ public class SpatialPoints<T> {
 
     public QuadTree<T> getQuadTree() {
         return quadTree;
+    }
+
+    public enum searchType {
+        CIRCLE, BOX, STRICT_BOX
     }
 }

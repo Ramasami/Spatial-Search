@@ -7,7 +7,7 @@ public class QuadNode<T> {
     private final Point point;
 
     public QuadNode(Point p, T data) {
-        this.data =  data;
+        this.data = data;
         this.point = p;
     }
 

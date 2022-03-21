@@ -5,17 +5,16 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class QuadTree<P> {
+    private static final int maxLength = 20;
     private final Point topLeft;
     private final Point bottomRight;
     private final Set<QuadNode<P>> nodes;
+    private final int currentLength;
+    boolean isLeaf = true;
     private QuadTree<P> topLeftTree;
     private QuadTree<P> topRightTree;
     private QuadTree<P> bottomLeftTree;
     private QuadTree<P> bottomRightTree;
-    private final int currentLength;
-    private static final int maxLength = 20;
-
-    boolean isLeaf = true;
 
     public QuadTree(Point topLeft, Point bottomRight, int currentLength) {
         this.topLeft = topLeft;
