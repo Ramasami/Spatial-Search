@@ -83,7 +83,6 @@ public class Graph<T> extends PApplet {
         }
 
         if (latitude != null && longitude != null) {
-
             if (range != null) {
                 searchedNodes.forEach(node -> {
                     stroke(0, 255, 0);
@@ -99,10 +98,11 @@ public class Graph<T> extends PApplet {
                         break;
                     case CIRCLE:
                         printCircle(latitude, longitude, range, 1, 0, 0, 255, null);
+                        break;
                 }
                 printRect(searchTree.getTopLeft().getLatitude(), searchTree.getTopLeft().getLongitude(),
                         searchTree.getBottomRight().getLatitude(), searchTree.getBottomRight().getLongitude(),
-                        1, 0, 0, 0, 200);
+                        2, 255, 0, 0, null);
             }
             printPoint(latitude, longitude, 10, 0, 0, 255);
         }
