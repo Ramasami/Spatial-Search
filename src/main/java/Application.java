@@ -11,7 +11,7 @@ public class Application {
         }
         System.out.println("InsertionTime:" + (System.currentTimeMillis() - time));
 
-        Graph<String> mySketch = new Graph<>(spatialPoints, 75, 75, 20, SpatialPoints.searchType.CIRCLE);
-        PApplet.runSketch(new String[]{"MySketch"}, mySketch);
+        Graph<String> quadTree = new Graph<>(spatialPoints, 75, 75, 20, SpatialPoints.searchType.CIRCLE);
+        PApplet.runSketch(new String[]{"QuadTree"}, quadTree);
     }
 }
