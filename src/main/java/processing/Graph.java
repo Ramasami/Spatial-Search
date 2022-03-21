@@ -5,9 +5,7 @@ import quad.QuadNode;
 import quad.QuadTree;
 import quad.SpatialPoints;
 
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -17,7 +15,7 @@ public class Graph<T> extends PApplet {
     private Double latitude;
     private Double longitude;
     private Double range;
-    private final SpatialPoints.searchType searchType;
+    private SpatialPoints.searchType searchType;
     private int mouseRange = 20;
     private boolean isShowingHoveredNodes = true;
     private Set<QuadNode<T>> searchedNodes;
@@ -43,7 +41,7 @@ public class Graph<T> extends PApplet {
         this.latitude = latitude;
         this.longitude = longitude;
         this.range = null;
-        this.searchType = null;
+        this.searchType = SpatialPoints.searchType.BOX;
         this.dataFunction = dataFunction;
     }
 
@@ -53,7 +51,7 @@ public class Graph<T> extends PApplet {
         this.latitude = null;
         this.longitude = null;
         this.range = null;
-        this.searchType = null;
+        this.searchType = SpatialPoints.searchType.BOX;
         this.dataFunction = dataFunction;
     }
 
@@ -279,6 +277,12 @@ public class Graph<T> extends PApplet {
             }
             case 'h':
                 showSearchResult = !showSearchResult;
+                break;
+            case 'x':
+                if (showSearchResult) {
+                    List<SpatialPoints.searchType> searchTypeList = Arrays.asList(SpatialPoints.searchType.values());
+                    searchType = searchTypeList.get((searchTypeList.indexOf(searchType) + 1) % searchTypeList.size());
+                }
                 break;
         }
         settings();
