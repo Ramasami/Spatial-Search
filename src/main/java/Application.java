@@ -2,6 +2,8 @@ import processing.Graph;
 import processing.core.PApplet;
 import quad.SpatialPoints;
 
+import static quad.SpatialPoints.searchType.*;
+
 public class Application {
     public static void main(String[] args) {
         SpatialPoints<String> spatialPoints = new SpatialPoints<>();
@@ -11,7 +13,7 @@ public class Application {
         }
         System.out.println("InsertionTime:" + (System.currentTimeMillis() - time));
 
-        Graph<String> quadTree = new Graph<>(spatialPoints, 75, 75, 20, SpatialPoints.searchType.CIRCLE);
+        Graph<String> quadTree = new Graph<>(spatialPoints, 75, 75, 20, CIRCLE);
         PApplet.runSketch(new String[]{"QuadTree"}, quadTree);
     }
 }
