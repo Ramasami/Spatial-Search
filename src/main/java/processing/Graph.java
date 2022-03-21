@@ -8,43 +8,53 @@ import quad.SpatialPoints;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class Graph<T> extends PApplet {
 
-    private final SpatialPoints<T> spatialPoints;
-    private final Double latitude;
-    private final Double longitude;
-    private final Double range;
+    private SpatialPoints<T> spatialPoints;
+    private Double latitude;
+    private Double longitude;
+    private Double range;
     private final SpatialPoints.searchType searchType;
-    private final int mouseRange = 20;
+    private int mouseRange = 20;
+    private boolean isShowingHoveredNodes = true;
     private Set<QuadNode<T>> searchedNodes;
     private QuadTree<T> searchTree;
+    private Integer size;
+    private final Function<Integer, T> dataFunction;
+    private boolean showSearchResult = true;
 
-    public Graph(SpatialPoints<T> spatialPoints, double latitude, double longitude, double range, SpatialPoints.searchType searchType) {
+    public Graph(SpatialPoints<T> spatialPoints, double latitude, double longitude, double range, SpatialPoints.searchType searchType, Function<Integer, T> dataFunction) {
         this.spatialPoints = spatialPoints;
+        this.size = spatialPoints.getQuadTree().getSize();
         this.latitude = latitude;
         this.longitude = longitude;
         this.range = range;
         this.searchType = searchType;
         assert searchType != null;
+        this.dataFunction = dataFunction;
     }
 
-    public Graph(SpatialPoints<T> spatialPoints, double latitude, double longitude) {
+    public Graph(SpatialPoints<T> spatialPoints, double latitude, double longitude, Function<Integer, T> dataFunction) {
         this.spatialPoints = spatialPoints;
+        this.size = spatialPoints.getQuadTree().getSize();
         this.latitude = latitude;
         this.longitude = longitude;
         this.range = null;
         this.searchType = null;
+        this.dataFunction = dataFunction;
     }
 
-    public Graph(SpatialPoints<T> spatialPoints) {
+    public Graph(SpatialPoints<T> spatialPoints, Function<Integer, T> dataFunction) {
         this.spatialPoints = spatialPoints;
+        this.size = spatialPoints.getQuadTree().getSize();
         this.latitude = null;
         this.longitude = null;
         this.range = null;
         this.searchType = null;
-
+        this.dataFunction = dataFunction;
     }
 
     public void settings() {
@@ -70,14 +80,80 @@ public class Graph<T> extends PApplet {
     }
 
     public void draw() {
-        noCursor();
         background(255);
         printQuadTree();
         printSearchResult();
-        showSelectedNodes();
+        showHoveredNodes();
     }
 
-    private void showSelectedNodes() {
+    public void keyPressed() {
+        switch (key) {
+            case 't':
+                isShowingHoveredNodes = !isShowingHoveredNodes;
+                break;
+            case 'q':
+                System.exit(0);
+            case '+':
+                if (isShowingHoveredNodes)
+                    mouseRange = Math.min(mouseRange + 1, height);
+                break;
+            case '-':
+                if (isShowingHoveredNodes)
+                    mouseRange = Math.max(mouseRange - 1, 10);
+                break;
+            case 'r': {
+                int size = spatialPoints.getQuadTree().getNodes().size();
+                spatialPoints = new SpatialPoints<>();
+                for (int i = 0; i < size; i++) {
+                    spatialPoints.insert(Math.random() * 100, Math.random() * 100, dataFunction.apply(i));
+                }
+                break;
+            }
+            case ']':
+                if (range != null)
+                    range = Math.min(range + 1, spatialPoints.getQuadTree().getTopLeft().getLatitude() - spatialPoints.getQuadTree().getTopLeft().getLongitude());
+                else
+                    range = 1.0;
+                break;
+            case '[':
+                if (range != null)
+                    range = Math.max(range - 1, 1);
+                else
+                    range = 1.0;
+                break;
+            case 'p':
+                latitude = map(mouseY, 0, height, spatialPoints.getQuadTree().getTopLeft().getLatitude(), spatialPoints.getQuadTree().getBottomRight().getLatitude());
+                longitude = map(mouseX, 0, width, spatialPoints.getQuadTree().getTopLeft().getLongitude(), spatialPoints.getQuadTree().getBottomRight().getLongitude());
+                break;
+            case '\'': {
+                spatialPoints.insert(Math.random() * 100, Math.random() * 100, dataFunction.apply(size++));
+                break;
+            }
+            case ';': {
+                Set<QuadNode<T>> nodesToRemove = spatialPoints.getQuadTree()
+                        .getNodes()
+                        .stream()
+                        .filter(node -> node.getData().equals(dataFunction.apply(size - 1)))
+                        .collect(Collectors.toSet());
+                for (QuadNode<T> node : nodesToRemove)
+                    spatialPoints.remove(node);
+                size = spatialPoints.getQuadTree().getSize();
+                break;
+            }
+            case 'h':
+                showSearchResult = !showSearchResult;
+                break;
+        }
+        settings();
+    }
+
+    private void showHoveredNodes() {
+        if (!isShowingHoveredNodes) {
+            cursor();
+            return;
+        } else {
+            noCursor();
+        }
         double mouseLatitude = map(mouseY, 0, height, spatialPoints.getQuadTree().getTopLeft().getLatitude(), spatialPoints.getQuadTree().getBottomRight().getLatitude());
         double mouseLongitude = map(mouseX, 0, width, spatialPoints.getQuadTree().getTopLeft().getLongitude(), spatialPoints.getQuadTree().getBottomRight().getLongitude());
         double range = resize(mouseRange, 0, height, spatialPoints.getQuadTree().getTopLeft().getLatitude(), spatialPoints.getQuadTree().getBottomRight().getLatitude());
@@ -101,7 +177,7 @@ public class Graph<T> extends PApplet {
     }
 
     private void printSearchResult() {
-        if (latitude != null && longitude != null) {
+        if (showSearchResult && latitude != null && longitude != null) {
             if (range != null) {
                 searchedNodes.forEach(node -> {
                     stroke(0, 255, 0);
@@ -135,7 +211,7 @@ public class Graph<T> extends PApplet {
             tree = queue.poll();
             printRect(tree.getTopLeft().getLatitude(), tree.getTopLeft().getLongitude(),
                     tree.getBottomRight().getLatitude(), tree.getBottomRight().getLongitude(),
-                    1, 0, 0, 0, 255);
+                    1, 200, 200, 200, 255);
             if (tree.isLeaf()) {
                 tree.getNodes().forEach(node -> {
                     printPoint(node.getPoint().getLatitude(), node.getPoint().getLongitude(), 5, 255, 0, 0);

@@ -165,6 +165,40 @@ public class QuadTree<P> {
         return nearByNode;
     }
 
+    public void remove(QuadNode<P> node) {
+        Point point = node.getPoint();
+        QuadTree<P> curr = this;
+        while (!curr.isLeaf) {
+            if (!curr.nodes.contains(node))
+                return;
+            else if (curr.nodes.size() == 1) {
+                curr.isLeaf = true;
+                curr.topLeftTree = null;
+                curr.topRightTree = null;
+                curr.bottomLeftTree = null;
+                curr.bottomRightTree = null;
+            }
+            curr.nodes.remove(node);
+            if (curr.isLeaf)
+                return;
+            if (point.getLongitude() < (curr.topLeft.getLongitude() + curr.bottomRight.getLongitude()) / 2) {
+                if (point.getLatitude() < (curr.topLeft.getLatitude() + curr.bottomRight.getLatitude()) / 2) {
+                    curr = curr.bottomLeftTree;
+                } else {
+                    curr = curr.topLeftTree;
+                }
+
+            } else {
+                if (point.getLatitude() < (curr.topLeft.getLatitude() + curr.bottomRight.getLatitude()) / 2) {
+                    curr = curr.bottomRightTree;
+
+                } else {
+                    curr = curr.topRightTree;
+                }
+            }
+        }
+    }
+
     public int getSize() {
         return nodes.size();
     }

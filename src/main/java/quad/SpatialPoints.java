@@ -53,6 +53,10 @@ public class SpatialPoints<T> {
         return quadTree;
     }
 
+    public void remove(QuadNode<T> node) {
+        quadTree.remove(node);
+    }
+
     public enum searchType {
         CIRCLE, BOX, STRICT_BOX
     }

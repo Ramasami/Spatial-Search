@@ -13,7 +13,7 @@ public class Application {
         }
         System.out.println("InsertionTime:" + (System.currentTimeMillis() - time));
 
-        Graph<String> quadTree = new Graph<>(spatialPoints, 75, 75, 20, CIRCLE);
+        Graph<String> quadTree = new Graph<>(spatialPoints, 75, 75, 20, CIRCLE, String::valueOf);
         PApplet.runSketch(new String[]{"QuadTree"}, quadTree);
     }
 }
