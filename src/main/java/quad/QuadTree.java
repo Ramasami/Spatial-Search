@@ -117,8 +117,9 @@ public class QuadTree<P> {
             return Collections.emptySet();
         Set<QuadNode<P>> nearByNode = new HashSet<>();
 
-        if (isLeaf)
+        if (isLeaf) {
             return nodes;
+        }
 
         double midLatitude = (topLeft.getLatitude() + bottomRight.getLatitude()) / 2;
         double midLongitude = (topLeft.getLongitude() + bottomRight.getLongitude()) / 2;
@@ -167,6 +168,38 @@ public class QuadTree<P> {
 
     public int getSize() {
         return nodes.size();
+    }
+
+    public Point getTopLeft() {
+        return topLeft;
+    }
+
+    public Point getBottomRight() {
+        return bottomRight;
+    }
+
+    public boolean isLeaf() {
+        return isLeaf;
+    }
+
+    public QuadTree<P> getTopLeftTree() {
+        return topLeftTree;
+    }
+
+    public QuadTree<P> getTopRightTree() {
+        return topRightTree;
+    }
+
+    public QuadTree<P> getBottomLeftTree() {
+        return bottomLeftTree;
+    }
+
+    public QuadTree<P> getBottomRightTree() {
+        return bottomRightTree;
+    }
+
+    public Set<QuadNode<P>> getNodes() {
+        return nodes;
     }
 
     @Override
